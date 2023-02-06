@@ -70,6 +70,7 @@ impl OBS {
 
     /// 同步 OBS 对应项目
     /// `osc checkout [Project]`
+    // TODO or NOT: project 路径已存在会运行失败
     pub fn checkout_prj(&self, prj: &str) -> crate::Result<()> {
         let _output = Command::new("osc")
                              .args(["checkout", prj])
@@ -85,6 +86,18 @@ impl OBS {
     pub fn add_files(&self, pkg: &Package) -> crate::Result<()> {
         let _output = Command::new("osc")
                              .args(["add", "./*"])
+                             .current_dir(self.workspace.package_dir(pkg))
+                             .output()
+                             .expect("Failed to excute osc.");
+
+        _output.is_ok()
+    }
+
+    /// 在对应的包的家目录里执行 commit 命令
+    /// `osc commit -m "MESSAGE"`
+    pub fn commit(&self, pkg: &Package, message: String) -> crate::Result<()> {
+        let _output = Command::new("osc")
+                             .args(["commit", "-m", message.as_str()])
                              .current_dir(self.workspace.package_dir(pkg))
                              .output()
                              .expect("Failed to excute osc.");

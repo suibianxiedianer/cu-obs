@@ -41,6 +41,26 @@ impl Workspace {
         self.project_dir(package).join(&package.package)
     }
 
+    pub fn remove_project(&self, package: &Package) -> crate::Result<()> {
+        let _path = self.project_dir(package);
+
+        if ! _path.exists() {
+            return Ok(())
+        }
+
+        fs::remove_dir_all(_path).map_err(|e|e.into())
+    }
+
+    pub fn remove_package(&self, package: &Package) -> crate::Result<()> {
+        let _path = self.package_dir(package);
+
+        if ! _path.exists() {
+            return Ok(())
+        }
+
+        fs::remove_dir_all(_path).map_err(|e|e.into())
+    }
+
     pub fn clean(path: &Path) -> crate::Result<()> {
         if path.is_file() {
             std::fs::remove_file(path)?

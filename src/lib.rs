@@ -41,6 +41,7 @@ pub trait IsOk {
 
     fn result(self) -> crate::Result<String>;
 }
+
 impl IsOk for std::process::Output {
     fn is_ok(self) -> crate::Result<()> {
         if self.status.success() {
