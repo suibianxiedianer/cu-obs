@@ -21,6 +21,17 @@ struct AddArgs {
 }
 
 #[derive(Parser, Debug)]
+struct StatusArgs {
+    /// The Repo option.
+    #[arg(short, long)]
+    repo: String,
+
+    /// The target arch, x86_64/aarch64, etc.
+    #[arg(short, long)]
+    arch: String,
+}
+
+#[derive(Parser, Debug)]
 struct BinariesArgs {
     /// The Repo option.
     repo: String,
@@ -39,7 +50,7 @@ enum CliSub {
     Add(AddArgs),
 
     /// Show the current status.
-    Status,
+    Status(StatusArgs),
 
     /// Download binaries packages if build success.
     Binaries(BinariesArgs),
