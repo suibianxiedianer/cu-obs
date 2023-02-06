@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::process::Command;
 
 use crate::{
@@ -59,21 +60,20 @@ impl OBS {
         package_path.push_str("/");
         package_path.push_str(pkg.package());
 
-        let _output = Command::new("osc")
-                             .args(["checkout", package_path.as_str()])
-                             .current_dir(self.workspace.root())
-                             .output()
-                             .expect("Failed to excute osc.");
-
-        _output.is_ok()
+        self.run_checkout(&package_path)
     }
 
     /// 同步 OBS 对应项目
     /// `osc checkout [Project]`
     // TODO or NOT: project 路径已存在会运行失败
     pub fn checkout_prj(&self, prj: &str) -> crate::Result<()> {
+        self.run_checkout(prj)
+    }
+
+    /// 在工作目录下执行 checkout，参数为目标项目或包
+    fn run_checkout(&self, target: &str) -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .args(["checkout", prj])
+                             .args(["checkout", target])
                              .current_dir(self.workspace.root())
                              .output()
                              .expect("Failed to excute osc.");
@@ -108,13 +108,7 @@ impl OBS {
     /// 更新，拉取/推送 最新的源码，仅针对项目中的包
     /// `osc update`
     pub fn update(&self, pkg: &Package) -> crate::Result<()> {
-        let _output = Command::new("osc")
-                             .arg("update")
-                             .current_dir(self.workspace.package_dir(pkg))
-                             .output()
-                             .expect("Failed to excute osc.");
-
-        _output.is_ok()
+        Self::run_update(self.workspace.package_dir(pkg))
     }
 
     /// 更新，拉取/推送 最新的源码，操作对象为整体项目
@@ -123,9 +117,14 @@ impl OBS {
         let mut root = self.workspace.root().to_owned();
         root.push(prj);
 
+        Self::run_update(root)
+    }
+
+    /// 在对应路径执行 update
+    fn run_update(path: PathBuf) -> crate::Result<()> {
         let _output = Command::new("osc")
                              .arg("update")
-                             .current_dir(root)
+                             .current_dir(path)
                              .output()
                              .expect("Failed to excute osc.");
 
