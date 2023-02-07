@@ -1,3 +1,5 @@
+pub mod cli;
+
 pub(crate) mod workspace;
 
 pub(crate) mod obs;
