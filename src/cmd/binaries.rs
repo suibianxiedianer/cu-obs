@@ -4,19 +4,23 @@ use crate::{obs::OBS, workspace::Workspace, Package};
 pub struct Binaries {
     repo: String,
     arch: String,
-    path: String,
+    path: Option<String>,
 }
 
 impl Binaries {
-    pub(crate) fn new(repo: impl ToString, arch: impl ToString, path: impl ToString) -> Self {
+    pub fn new(repo: impl ToString, arch: impl ToString) -> Self {
         Binaries {
             repo: repo.to_string(),
             arch: arch.to_string(),
-            path: path.to_string(),
+            path: None,
         }
     }
 
-    pub(crate) fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
+    pub fn set_path(&mut self, path: String) {
+        self.path = Some(path);
+    }
+
+    pub fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
         Ok(())
     }
 }

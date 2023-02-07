@@ -2,19 +2,27 @@ use crate::Package;
 
 #[derive(Debug)]
 pub struct Status {
-    repo: String,
-    arch: String,
+    repo: Option<String>,
+    arch: Option<String>,
 }
 
 impl Status {
-    pub(crate) fn new(repo: impl ToString, arch: impl ToString) -> Self {
+    pub fn new() -> Self {
         Status {
-            repo: repo.to_string(),
-            arch: arch.to_string(),
+            repo: None,
+            arch: None,
         }
     }
 
-    pub(crate) fn apply(&self, pkg: &Package) -> crate::Result<()> {
+    pub fn set_repo(&mut self, repo: String) {
+        self.repo = Some(repo);
+    }
+
+    pub fn set_arch(&mut self, arch: String) {
+        self.arch = Some(arch);
+    }
+
+    pub fn apply(&self, pkg: &Package) -> crate::Result<()> {
         Ok(())
     }
 }
