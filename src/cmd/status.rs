@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use crate::Package;
 
 #[derive(Debug)]
@@ -16,7 +14,7 @@ impl Status {
         }
     }
 
-    pub(crate) fn apply(&self) -> crate::Result<()> {
+    pub(crate) fn apply(&self, pkg: &Package) -> crate::Result<()> {
         Ok(())
     }
 }

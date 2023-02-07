@@ -3,14 +3,15 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::{workspace::Workspace, IsOk, Package};
+use crate::IsOk;
 
 pub struct RPM;
 
 /// RPM 工具
 impl RPM {
     /// 判断给定的路径文件是否为 rpm 源码包
-    pub fn is_src(file: &Path) -> crate::Result<()> {
+    /// 预留，暂无用处
+    pub fn _is_src(file: &Path) -> crate::Result<()> {
         // use file
         let _type = Command::new("file")
             .arg(file.to_str().unwrap())

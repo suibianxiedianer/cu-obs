@@ -42,8 +42,8 @@ impl Command {
 
         match self {
             Add(cmd) => cmd.apply(pkg, ws),
-            Status(cmd) => cmd.apply(),
-            Binaries(cmd) => cmd.apply(),
+            Status(cmd) => cmd.apply(pkg),
+            Binaries(cmd) => cmd.apply(pkg, ws),
             Unknown(cmd) => cmd.apply(),
         }
     }

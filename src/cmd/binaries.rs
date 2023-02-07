@@ -1,4 +1,4 @@
-use crate::Package;
+use crate::{obs::OBS, workspace::Workspace, Package};
 
 #[derive(Debug)]
 pub struct Binaries {
@@ -16,7 +16,7 @@ impl Binaries {
         }
     }
 
-    pub(crate) fn apply(&self) -> crate::Result<()> {
+    pub(crate) fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
         Ok(())
     }
 }
