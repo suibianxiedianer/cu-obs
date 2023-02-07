@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct Unknown {
-    command: String
+    command: String,
 }
 
 impl Unknown {

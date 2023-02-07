@@ -1,7 +1,4 @@
-use crate::{
-    Package,
-    workspace::Workspace,
-};
+use crate::{workspace::Workspace, Package};
 
 mod add;
 pub use add::Add;

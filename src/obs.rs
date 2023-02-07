@@ -1,11 +1,7 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::{
-    IsOk,
-    Package,
-    workspace::Workspace,
-};
+use crate::{workspace::Workspace, IsOk, Package};
 
 /// OBS 系统，使用 osc 进行一些操作
 pub struct OBS {
@@ -17,9 +13,9 @@ impl OBS {
     /// `osc api /about`
     pub fn alive() -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .args(["api", "/about"])
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["api", "/about"])
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -34,9 +30,9 @@ impl OBS {
     pub fn prj_exist(&self, prj: &str) -> crate::Result<()> {
         let _meta = format!("/source/{}/_meta", prj);
         let _output = Command::new("osc")
-                             .args(["api", &_meta])
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["api", &_meta])
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -46,9 +42,9 @@ impl OBS {
     pub fn pkg_exist(&self, pkg: &Package) -> crate::Result<()> {
         let _meta = format!("/source/{}/{}/_meta", pkg.project, pkg.package);
         let _output = Command::new("osc")
-                             .args(["api", &_meta])
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["api", &_meta])
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -73,10 +69,10 @@ impl OBS {
     /// 在工作目录下执行 checkout，参数为目标项目或包
     fn run_checkout(&self, target: &str) -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .args(["checkout", target])
-                             .current_dir(self.workspace.root())
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["checkout", target])
+            .current_dir(self.workspace.root())
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -85,10 +81,10 @@ impl OBS {
     /// `osc add ./*`
     pub fn add_files(&self, pkg: &Package) -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .args(["add", "./*"])
-                             .current_dir(self.workspace.package_dir(pkg))
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["add", "./*"])
+            .current_dir(self.workspace.package_dir(pkg))
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -97,10 +93,10 @@ impl OBS {
     /// `osc commit -m "MESSAGE"`
     pub fn commit(&self, pkg: &Package, message: String) -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .args(["commit", "-m", message.as_str()])
-                             .current_dir(self.workspace.package_dir(pkg))
-                             .output()
-                             .expect("Failed to excute osc.");
+            .args(["commit", "-m", message.as_str()])
+            .current_dir(self.workspace.package_dir(pkg))
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }
@@ -123,10 +119,10 @@ impl OBS {
     /// 在对应路径执行 update
     fn run_update(path: PathBuf) -> crate::Result<()> {
         let _output = Command::new("osc")
-                             .arg("update")
-                             .current_dir(path)
-                             .output()
-                             .expect("Failed to excute osc.");
+            .arg("update")
+            .current_dir(path)
+            .output()
+            .expect("Failed to excute osc.");
 
         _output.is_ok()
     }

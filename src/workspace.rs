@@ -18,11 +18,7 @@ impl Workspace {
         let temp = root.join("_tmp");
         fs::create_dir_all(&temp)?;
 
-        Ok(Workspace {
-            root,
-            temp,
-        })
-
+        Ok(Workspace { root, temp })
     }
 
     /// root 字段
@@ -60,7 +56,7 @@ impl Workspace {
         self.package_dir(pkg).read_dir()?.for_each(|entry| {
             let entry = entry.unwrap();
             if entry.file_name() == ".osc" {
-                return
+                return;
             }
             Self::remove(&entry.path()).unwrap();
         });
@@ -71,10 +67,10 @@ impl Workspace {
     /// rm -rf <Path>
     pub fn remove(path: &Path) -> crate::Result<()> {
         if path.is_file() {
-            fs::remove_file(path).map_err(|e|e.into())
+            fs::remove_file(path).map_err(|e| e.into())
         } else {
             fs::remove_dir_all(&path)?;
-            fs::remove_dir(path).map_err(|e|e.into())
+            fs::remove_dir(path).map_err(|e| e.into())
         }
     }
 }

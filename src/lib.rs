@@ -1,7 +1,7 @@
 pub(crate) mod workspace;
 
-pub(crate) mod rpm;
 pub(crate) mod obs;
+pub(crate) mod rpm;
 
 pub mod cmd;
 

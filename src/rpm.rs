@@ -3,11 +3,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::{
-    IsOk,
-    Package,
-    workspace::Workspace,
-};
+use crate::{workspace::Workspace, IsOk, Package};
 
 pub struct RPM;
 
@@ -17,17 +13,17 @@ impl RPM {
     pub fn is_src(file: &Path) -> crate::Result<()> {
         // use file
         let _type = Command::new("file")
-                           .arg(file.to_str().unwrap())
-                           .stdout(Stdio::piped())
-                           .spawn()
-                           .expect("Failed to execute file.");
+            .arg(file.to_str().unwrap())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Failed to execute file.");
 
         // grep key words
         let _output = Command::new("grep")
-                           .arg("RPM v.* src$")
-                           .stdin(Stdio::from(_type.stdout.unwrap()))
-                           .output()
-                           .expect("failed to execute grep");
+            .arg("RPM v.* src$")
+            .stdin(Stdio::from(_type.stdout.unwrap()))
+            .output()
+            .expect("failed to execute grep");
 
         _output.is_ok()
     }
@@ -35,9 +31,9 @@ impl RPM {
     /// 获取软件包的 %{name} 字段
     pub fn get_name(file: &Path) -> crate::Result<String> {
         let _output = Command::new("rpm")
-                           .args(["-qp", "--qf", "%{name}", file.to_str().unwrap()])
-                           .output()
-                           .expect("Failed to excute rpm.");
+            .args(["-qp", "--qf", "%{name}", file.to_str().unwrap()])
+            .output()
+            .expect("Failed to excute rpm.");
 
         _output.result()
     }
@@ -45,9 +41,9 @@ impl RPM {
     /// 获取软件包的 %{version} 字段
     pub fn get_version(file: &Path) -> crate::Result<String> {
         let _output = Command::new("rpm")
-                           .args(["-qp", "--qf", "%{version}", file.to_str().unwrap()])
-                           .output()
-                           .expect("Failed to excute rpm.");
+            .args(["-qp", "--qf", "%{version}", file.to_str().unwrap()])
+            .output()
+            .expect("Failed to excute rpm.");
 
         _output.result()
     }
@@ -55,9 +51,9 @@ impl RPM {
     /// 获取软件包的 %{release} 字段
     pub fn get_release(file: &Path) -> crate::Result<String> {
         let _output = Command::new("rpm")
-                           .args(["-qp", "--qf", "%{release}", file.to_str().unwrap()])
-                           .output()
-                           .expect("Failed to excute rpm.");
+            .args(["-qp", "--qf", "%{release}", file.to_str().unwrap()])
+            .output()
+            .expect("Failed to excute rpm.");
 
         _output.result()
     }
@@ -73,16 +69,15 @@ impl RPM {
             let root = root.to_str().unwrap();
             _specdir = format!("_spcedir {}", root);
             _sourcedir = format!("_sourcedir {}", root);
-            args = vec!["--define", &_specdir,
-                        "--define", &_sourcedir];
+            args = vec!["--define", &_specdir, "--define", &_sourcedir];
         }
 
         let _output = Command::new("rpm")
-                           .arg("-i")
-                           .args(&args)
-                           .arg(file.to_str().unwrap())
-                           .output()
-                           .expect("Failed to execute rpm.");
+            .arg("-i")
+            .args(&args)
+            .arg(file.to_str().unwrap())
+            .output()
+            .expect("Failed to execute rpm.");
 
         _output.is_ok()
     }
