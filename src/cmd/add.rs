@@ -1,7 +1,11 @@
 use std::process::{Command, Stdio};
 
-use crate::Package;
-use crate::workspace::Workspace;
+use crate::{
+    Package,
+    obs::OBS,
+    rpm::RPM,
+    workspace::Workspace,
+};
 
 #[derive(Debug)]
 pub struct Add {
@@ -16,7 +20,7 @@ impl Add {
     }
 
     // TODO: current_dir not confirm
-    pub(crate) fn apply(&self) -> crate::Result<()> {
+    pub(crate) fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
         // release source code start
         // 1 : rpm2cpio
         let rpm2cpio = Command::new("rpm2cpio")
