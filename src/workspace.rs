@@ -4,7 +4,7 @@ use std::process::Command;
 
 use crate::{Package, WORKSPACE};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Workspace {
     root: PathBuf,
     temp: PathBuf,

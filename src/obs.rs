@@ -9,6 +9,12 @@ pub struct OBS {
 }
 
 impl OBS {
+    /// new
+    pub fn new(workspace: &Workspace) -> Self {
+        OBS {
+            workspace: workspace.clone(),
+        }
+    }
     /// 用于测试与 OBS 服务器的连接是否正常
     /// `osc api /about`
     pub fn alive() -> crate::Result<()> {
@@ -27,7 +33,7 @@ impl OBS {
 
     /// 是否存在此项目
     /// `osc api /source/[Project]/_meta`
-    pub fn prj_exist(&self, prj: &str) -> crate::Result<()> {
+    pub fn prj_exist(prj: &str) -> crate::Result<()> {
         let _meta = format!("/source/{}/_meta", prj);
         let _output = Command::new("osc")
             .args(["api", &_meta])
@@ -39,7 +45,7 @@ impl OBS {
 
     /// 是否存在此软件
     /// `osc api /source/[Project]/[Package]/_meta`
-    pub fn pkg_exist(&self, pkg: &Package) -> crate::Result<()> {
+    pub fn pkg_exist(pkg: &Package) -> crate::Result<()> {
         let _meta = format!("/source/{}/{}/_meta", pkg.project, pkg.package);
         let _output = Command::new("osc")
             .args(["api", &_meta])
@@ -125,5 +131,24 @@ impl OBS {
             .expect("Failed to excute osc.");
 
         _output.is_ok()
+    }
+
+    /// 清理 `项目/包` 下的源码文件，但会先更新
+    pub fn clean_source(&self, pkg: &Package) -> crate::Result<()> {
+        // 首先确定是否存在此项目，没有先创建
+        Self::alive()?;
+        Self::pkg_exist(pkg).or_else(|_| Self::init_pkg())?;
+
+        let _osc = self.workspace.package_dir(pkg).join(".osc");
+        // 当 [工作区]/[项目]/[包]/.osc 目录存在时，可认为此时目录仅需更新
+        // 否则清理 pkg 项目目录，重新拉取
+        if _osc.is_dir() {
+            self.update(pkg)?;
+        } else {
+            self.workspace.remove_package(pkg)?;
+            self.checkout(pkg)?;
+        }
+
+        self.workspace.clean_source(pkg)
     }
 }

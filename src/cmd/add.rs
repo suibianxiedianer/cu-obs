@@ -1,4 +1,4 @@
-use std::process::{Command, Stdio};
+use std::path::Path;
 
 use crate::{obs::OBS, rpm::RPM, workspace::Workspace, Package};
 
@@ -7,6 +7,7 @@ pub struct Add {
     file: String,
 }
 
+// TODO: file 可能是文件路径，可能是 url，需对其进行处理
 impl Add {
     pub(crate) fn new(file: impl ToString) -> Self {
         Add {
@@ -14,27 +15,25 @@ impl Add {
         }
     }
 
-    // TODO: current_dir not confirm
+    /// 对于指家的参数文件，默认为 src.rpm 处理，将其解开并添加、更新至 OBS 对应的位置
     pub(crate) fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
-        // release source code start
-        // 1 : rpm2cpio
-        let rpm2cpio = Command::new("rpm2cpio")
-            .arg(&self.file)
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to excute rpm2cpio.");
+        let _path = Path::new(&self.file);
+        let obs = OBS::new(ws);
 
-        // 2 : cpio
-        let cpio = Command::new("cpio")
-            .arg("-div")
-            .stdin(Stdio::from(rpm2cpio.stdout.unwrap()))
-            .status()
-            .expect("Failed to execute cpio after rpm2cpio done.");
-        // release source code done
+        obs.clean_source(pkg)?;
 
-        // add
+        RPM::install_src(Path::new(_path), Some(ws.package_dir(pkg)))?;
 
-        // commit
-        Ok(())
+        obs.add_files(pkg)?;
+
+        let mut comment = format!(
+            "auto submit {}-{}.{}",
+            RPM::get_name(_path).unwrap(),
+            RPM::get_version(_path).unwrap(),
+            RPM::get_release(_path).unwrap()
+        );
+
+        obs.commit(pkg, comment)?;
+        obs.update(pkg)
     }
 }
