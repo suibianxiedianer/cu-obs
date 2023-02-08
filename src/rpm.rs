@@ -44,6 +44,21 @@ impl RPM {
         Ok(self)
     }
 
+    /// 返回 RPM 包的名称
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// 返回 RPM 包的版本
+    pub fn version(&self) -> &str {
+        &self.version
+    }
+
+    /// 返回 RPM 包的发布版本
+    pub fn release(&self) -> &str {
+        &self.release
+    }
+
     /// 判断给定的路径文件是否为 rpm 格式
     pub fn is_rpm<P: ?Sized + AsRef<OsStr>>(path: &P) -> bool {
         // use file
