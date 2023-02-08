@@ -3,6 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use mktemp::Temp;
+use path_absolutize::*;
 
 use crate::{Package, WORKSPACE};
 
@@ -21,8 +22,8 @@ impl Workspace {
         fs::create_dir_all(&temp)?;
 
         Ok(Workspace {
-            root: root.canonicalize().unwrap(),
-            temp: temp.canonicalize().unwrap(),
+            root: root.absolutize().unwrap().to_path_buf(),
+            temp: temp.absolutize().unwrap().to_path_buf(),
         })
     }
 

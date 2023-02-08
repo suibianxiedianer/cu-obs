@@ -8,6 +8,9 @@ use regex::Regex;
 
 use crate::IsOk;
 
+#[cfg(test)]
+use crate::workspace::Workspace;
+
 pub struct RPM {
     path: PathBuf,
     name: String,
@@ -20,6 +23,7 @@ impl RPM {
     /// 新建一个 RPM，并执行初始化检查与字段填充
     pub fn new<P: ?Sized + AsRef<OsStr>>(path: &P) -> crate::Result<Self> {
         let path = PathBuf::from(path);
+        path.canonicalize()?;
         let mut rpm = RPM {
             path,
             name: String::new(),
@@ -110,7 +114,7 @@ impl RPM {
     /// 查询并格式化
     fn query_format(&self, qf: &str) -> crate::Result<String> {
         let _output = Command::new("rpm")
-            .args(["-qp", "--qf", qf])
+            .args(["-qp", "--qf", qf, self.path.to_str().unwrap()])
             .output()
             .expect("Failed to excute rpm.");
 
@@ -126,7 +130,7 @@ impl RPM {
 
         if let Some(root) = target {
             let root = root.to_str().unwrap();
-            _specdir = format!("_spcedir {}", root);
+            _specdir = format!("_specdir {}", root);
             _sourcedir = format!("_sourcedir {}", root);
             args = vec!["--define", &_specdir, "--define", &_sourcedir];
         }
@@ -139,5 +143,45 @@ impl RPM {
             .expect("Failed to execute rpm.");
 
         _output.is_ok()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{RPM, Workspace};
+
+    #[test]
+    fn no_file() {
+        match RPM::new("test/no-1.0-1.ule3.src.rpm") {
+            Err(_) => assert!(true),
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn not_rpm() {
+        std::fs::File::create("test/empty").unwrap();
+        match RPM::new("test/empty") {
+            Err(_) => assert!(true),
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn base() {
+        let src_rpm = RPM::new("test/cc-1.0-1.ule3.src.rpm").unwrap();
+        assert!(src_rpm._is_src());
+
+        use std::fs;
+        use std::path::PathBuf;
+        use path_absolutize::*;
+        let mut target = PathBuf::from("test/rpmbuild");
+        fs::remove_dir_all(target.to_str().unwrap());
+        fs::create_dir_all(target.to_str().unwrap()).unwrap();
+        target = target.absolutize().unwrap().to_path_buf();
+
+        let target = PathBuf::from(target);
+        
+        src_rpm.install_src(Some(target.clone())).unwrap();
     }
 }
