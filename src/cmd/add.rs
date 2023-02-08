@@ -54,7 +54,7 @@ impl Add {
         }
 
         obs.add_files(pkg)?;
-        let comment = format!("auto submit {}-{}.{}", &rpm.name(), &rpm.version(), &rpm.release());
+        let comment = format!("auto submit {}-{}-{}", &rpm.name(), &rpm.version(), &rpm.release());
         obs.commit(pkg, comment)?;
         obs.update(pkg)
     }

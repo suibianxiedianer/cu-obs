@@ -1,5 +1,5 @@
 [package]
-name = "obs_tools"
+name = "cu_obs"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,4 +7,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+curl = "0.4.44"
+mktemp = "0.5.0"
+regex = { version = "1" }
 toml = { version = "0" }

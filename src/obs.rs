@@ -27,7 +27,7 @@ impl OBS {
     }
 
     /// 通过 `Package` 结构体，创建对应项目中的包
-    pub fn init_pkg() -> crate::Result<()> {
+    pub fn init_pkg(pkg: &Package) -> crate::Result<()> {
         Ok(())
     }
 
@@ -137,7 +137,7 @@ impl OBS {
     pub fn clean_source(&self, pkg: &Package) -> crate::Result<()> {
         // 首先确定是否存在此项目，没有先创建
         Self::alive()?;
-        Self::pkg_exist(pkg).or_else(|_| Self::init_pkg())?;
+        Self::pkg_exist(pkg).or_else(|_| Self::init_pkg(pkg))?;
 
         let _osc = self.workspace.package_dir(pkg).join(".osc");
         // 当 [工作区]/[项目]/[包]/.osc 目录存在时，可认为此时目录仅需更新
