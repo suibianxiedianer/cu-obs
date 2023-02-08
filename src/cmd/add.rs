@@ -24,10 +24,12 @@ impl Add {
     pub(crate) fn apply(&self, pkg: &Package, ws: &Workspace) -> crate::Result<()> {
         // 如果是 url，需先下载
         let mut file = PathBuf::from(&self.uri);
+        let mut _clean = false;
         let re = Regex::new(r"^http(|s)://").unwrap();
         if re.is_match(&self.uri) {
             let name = &self.uri.rsplit("/").next().unwrap();
             file = ws.temp();
+            _clean = true;
             file.push(name);
             let mut output = File::create(&file)?;
 
@@ -47,6 +49,9 @@ impl Add {
         // clean & install
         obs.clean_source(pkg)?;
         rpm.install_src(Some(ws.package_dir(pkg)))?;
+        if _clean {
+            Workspace::remove(file.parent().unwrap());
+        }
 
         obs.add_files(pkg)?;
         let comment = format!("auto submit {}-{}.{}", &rpm.name(), &rpm.version(), &rpm.release());
