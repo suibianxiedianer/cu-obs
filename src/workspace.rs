@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use mktemp::Temp;
+
 use crate::{Package, WORKSPACE};
 
 #[derive(Debug, Clone)]
@@ -25,9 +27,9 @@ impl Workspace {
         &self.root
     }
 
-    /// temp 字段, temp 还没想好怎么用
-    pub fn temp(&self) -> &PathBuf {
-        &self.temp
+    /// 在 工作区/_tmp 下新建并返回一个目录
+    pub fn temp(&self) -> PathBuf {
+        Temp::new_dir_in(&self.temp).unwrap().to_path_buf()
     }
 
     /// 工作区中对应项目的路径
