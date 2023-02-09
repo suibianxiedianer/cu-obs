@@ -21,6 +21,11 @@ struct AddArgs {
 }
 
 #[derive(Parser, Debug)]
+struct NewArgs {
+    path: String,
+}
+
+#[derive(Parser, Debug)]
 struct StatusArgs {
     /// The Repo option.
     #[arg(short, long)]
@@ -46,8 +51,11 @@ struct BinariesArgs {
 
 #[derive(Subcommand, Debug)]
 enum CliSub {
-    /// Add a package from src.rpm.
+    /// Add a package from src.rpm, it will add to the exist pkg or init one, return the package id.
     Add(AddArgs),
+
+    /// Create a once build package from src.rpm, it will return the package id.
+    New(NewArgs),
 
     /// Show the current status.
     Status(StatusArgs),

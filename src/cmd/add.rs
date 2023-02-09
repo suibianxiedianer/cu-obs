@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use curl::easy::Easy;
 use regex::Regex;
@@ -31,16 +31,7 @@ impl Add {
             file = ws.temp_dir();
             _clean = true;
             file.push(name);
-            let mut output = File::create(&file)?;
-
-            let mut curl = Easy::new();
-            curl.url(&self.uri)?;
-            curl.write_function(move |data| {
-                output.write(&data).unwrap();
-                Ok(data.len())
-            });
-
-            curl.perform()?;
+            download(&self.uri, &file)?;
         }
 
         let rpm = RPM::new(&file)?;
@@ -58,4 +49,17 @@ impl Add {
         obs.commit(pkg, comment)?;
         obs.update(pkg)
     }
+}
+
+fn download<P: AsRef<Path>>(url: &str, path: &P) -> crate::Result<()> {
+    let mut output = File::create(&path)?;
+    
+    let mut curl = Easy::new();
+    curl.url(url)?;
+    curl.write_function(move |data| {
+        output.write(&data).unwrap();
+        Ok(data.len())
+    })?;
+    
+    curl.perform().map_err(|e| e.into())
 }
