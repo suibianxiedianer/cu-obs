@@ -28,7 +28,7 @@ impl Add {
         let re = Regex::new(r"^http(|s)://").unwrap();
         if re.is_match(&self.uri) {
             let name = &self.uri.rsplit("/").next().unwrap();
-            file = ws.temp();
+            file = ws.temp_dir();
             _clean = true;
             file.push(name);
             let mut output = File::create(&file)?;

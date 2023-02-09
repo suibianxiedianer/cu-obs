@@ -17,13 +17,13 @@ impl Workspace {
     // init workspace, clean tempdir?
     // TODO: not confirm yet
     pub fn init<P: ?Sized + AsRef<OsStr>>(path: &P) -> crate::Result<Self> {
-        let mut root = PathBuf::from(path);
+        let mut root = PathBuf::from(path).absolutize().unwrap().to_path_buf();
         let mut temp = root.join("_tmp");
         fs::create_dir_all(&temp)?;
 
         Ok(Workspace {
-            root: root.absolutize().unwrap().to_path_buf(),
-            temp: temp.absolutize().unwrap().to_path_buf(),
+            root: root,
+            temp: temp,
         })
     }
 
@@ -32,9 +32,16 @@ impl Workspace {
         &self.root
     }
 
-    /// 在 工作区/_tmp 下新建并返回一个目录
-    pub fn temp(&self) -> PathBuf {
-        Temp::new_dir_in(&self.temp).unwrap().to_path_buf()
+    /// 生成一个在 [工作区]/_tmp 下可用的空文件名
+    pub fn temp_file(&self) -> PathBuf {
+        Temp::new_file_in(&self.temp).unwrap().to_path_buf()
+    }
+
+    /// 在 [工作区]/_tmp 下新建并返回一个目录
+    pub fn temp_dir(&self) -> PathBuf {
+        let temp = Temp::new_dir_in(&self.temp).unwrap().to_path_buf();
+        fs::create_dir(&temp).unwrap();
+        temp
     }
 
     /// 工作区中对应项目的路径
@@ -90,10 +97,15 @@ mod test {
     fn base() {
         let ws = Workspace::init("./workspace").unwrap();
 
-        let _tmp = ws.temp();
+        let _tmp_file = ws.temp_file();
+        assert!(!_tmp_file.exists());
+
+        let _tmp_dir = ws.temp_dir();
+        fs::remove_dir(_tmp_dir).unwrap();
 
         let pkg = Package::new("prj", "pkg");
 
+        // test env prepare
         let pkg_dir = ws.package_dir(&pkg);
         let mut _osc = pkg_dir.clone();
         _osc.push(".osc");
@@ -107,6 +119,7 @@ mod test {
             File::create(&_demo).unwrap();
         }
 
+        // func test
         ws.clean_source(&pkg);
         assert!(!_demo.exists());
         assert!(_osc.exists());
